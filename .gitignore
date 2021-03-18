@@ -6,3 +6,6 @@
 /pkg/
 /spec/reports/
 /tmp/
+.DS_Store
+cul-folio-edge-0.1.0.gem
+
