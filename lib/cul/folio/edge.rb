@@ -121,7 +121,6 @@ module CUL
             # TODO: Add error checking here -- :username could be blank, or the return from
             # patron_uuid could fail
             folio_id = self.patron_uuid(okapi, token, identifiers[:username])[:folio_id]
-            puts("FID: #{folio_id}")
           end
 
           url = "#{okapi}/patron/account/#{folio_id}?includeLoans=true&includeHolds=true"
@@ -137,7 +136,6 @@ module CUL
 
           begin
             response = RestClient.get(url, headers)
-            puts "response: #{response}"
             return_value[:account] = JSON.parse(response.body)
             return_value[:code] = response.code
           rescue RestClient::ExceptionWithResponse => err
@@ -145,7 +143,7 @@ module CUL
             return_value[:error] = err.response.body
           end
 
-
+          return return_value
         end
     end
   end
