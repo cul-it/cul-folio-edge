@@ -166,7 +166,7 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.renew_item(okapi, tenant, token, username, itemId)
-          userId = self.patron_uuid(okapi, tenant, token, identifiers[:username])[:folio_id]
+          userId = self.patron_uuid(okapi, tenant, token, username)
           # TODO: Add error checking here -- :username could be blank, or the return from
           # patron_uuid could fail
           url = "#{okapi}/patron/account/#{userId}/item/#{itemId}/renew"
