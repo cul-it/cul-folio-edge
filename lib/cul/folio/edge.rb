@@ -59,6 +59,7 @@ module CUL
         #
         # Params:
         # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: An Okapi tenant ID
         # +token+:: An Okapi token string from a previous authentication call
         # +username+:: The 'username' property of a user record in FOLIO (For CUL, this is the user's NetId) 
         #
@@ -106,6 +107,7 @@ module CUL
         #
         # Params:
         # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: An Okapi tenant ID
         # +token+:: An Okapi token string from a previous authentication call
         # +identifiers+:: A hash containing either a +:folio_id+ string (a FOLIO user's UUID)
         # or a +:username+ string (a FOLIO user's username)
@@ -138,6 +140,44 @@ module CUL
           begin
             response = RestClient.get(url, headers)
             return_value[:account] = JSON.parse(response.body)
+            return_value[:code] = response.code
+          rescue RestClient::ExceptionWithResponse => err
+            return_value[:code] = err.response.code
+            return_value[:error] = err.response.body
+          end
+
+          return return_value
+        end
+
+        ##
+        # Connects to an Okapi instance and uses the +/patron/account+ endpoint
+        # from the +edge-patron+ module to renew an item
+        #
+        # Params:
+        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: An Okapi tenant ID
+        # +token+:: An Okapi token string from a previous authentication call
+        # +userId+:: A user UUID
+        # +itemId+:: An item UUID
+        #
+        # Return:
+        # A hash containing:
+        # +:code+:: An HTTP response code
+        # +:error+:: An error message, or nil
+        ##
+        def self.renew_item(okapi, tenant, token, userId, itemId)
+          url = "#{okapi}/patron/account/#{userId}/item/#{itemId}/renew"
+          headers = {
+            'X-Okapi-Tenant' => tenant,
+            'x-okapi-token' => token,
+            :accept => 'application/json',
+          }
+          return_value = {
+            :error => nil,
+          }
+
+          begin
+            response = RestClient.post(url, headers)
             return_value[:code] = response.code
           rescue RestClient::ExceptionWithResponse => err
             return_value[:code] = err.response.code
