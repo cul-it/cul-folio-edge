@@ -157,15 +157,18 @@ module CUL
         # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
         # +tenant+:: An Okapi tenant ID
         # +token+:: An Okapi token string from a previous authentication call
-        # +userId+:: A user UUID
-        # +itemId+:: An item UUID
+        # +userId+:: A FOLIO user username
+        # +itemId+:: A FOLIO item UUID
         #
         # Return:
         # A hash containing:
         # +:code+:: An HTTP response code
         # +:error+:: An error message, or nil
         ##
-        def self.renew_item(okapi, tenant, token, userId, itemId)
+        def self.renew_item(okapi, tenant, token, username, itemId)
+          userId = self.patron_uuid(okapi, tenant, token, identifiers[:username])[:folio_id]
+          # TODO: Add error checking here -- :username could be blank, or the return from
+          # patron_uuid could fail
           url = "#{okapi}/patron/account/#{userId}/item/#{itemId}/renew"
           headers = {
             'X-Okapi-Tenant' => tenant,
