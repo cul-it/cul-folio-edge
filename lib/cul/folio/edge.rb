@@ -13,6 +13,7 @@ module CUL
         #
         # Params:
         # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: FOLIO/OKAPI tenant ID
         # +username+:: Username
         # +password+:: Password
         #
@@ -22,10 +23,10 @@ module CUL
         # +:code+:: An HTTP response code
         # +:error+:: An error message, or nil
         ##
-        def self.authenticate(okapi, username, password)
+        def self.authenticate(okapi, tenant, username, password)
           url = "#{okapi}/authn/login"
           headers = {
-            'X-Okapi-Tenant' => 'diku',
+            'X-Okapi-Tenant' => tenant,
             :accept => 'application/json',
             'X-Forwarded-For' => 'Stripes',
             :content_type => 'application/json'
@@ -67,10 +68,10 @@ module CUL
         # +:code+:: An HTTP response code
         # +:error+:: An error message, or nil
         ##
-        def self.patron_uuid(okapi, token, username)
+        def self.patron_uuid(okapi, tenant, token, username)
           url = "#{okapi}/users?query=(username==#{username})"
           headers = {
-            'X-Okapi-Tenant' => 'diku',
+            'X-Okapi-Tenant' => tenant,
             'x-okapi-token' => token,
             :accept => 'application/json',
           }
@@ -115,17 +116,17 @@ module CUL
         # +:code+:: An HTTP response code
         # +:error+:: An error message, or nil
         ##
-        def self.patron_account(okapi, token, identifiers)
+        def self.patron_account(okapi, tenant, token, identifiers)
           folio_id = identifiers[:folio_id]
           if folio_id.nil?
             # TODO: Add error checking here -- :username could be blank, or the return from
             # patron_uuid could fail
-            folio_id = self.patron_uuid(okapi, token, identifiers[:username])[:folio_id]
+            folio_id = self.patron_uuid(okapi, tenant, token, identifiers[:username])[:folio_id]
           end
 
           url = "#{okapi}/patron/account/#{folio_id}?includeLoans=true&includeHolds=true"
           headers = {
-            'X-Okapi-Tenant' => 'diku',
+            'X-Okapi-Tenant' => tenant,
             'x-okapi-token' => token,
             :accept => 'application/json',
           }
