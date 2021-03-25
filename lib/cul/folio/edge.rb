@@ -180,7 +180,7 @@ module CUL
           }
 
           begin
-            response = RestClient.post(url, headers)
+            response = RestClient.post(url,{}, headers)
             return_value[:code] = response.code
           rescue RestClient::ExceptionWithResponse => err
             return_value[:code] = err.response.code
