@@ -55,7 +55,7 @@ module CUL
 
         ##
         # Connects to an Okapi instance and uses the +/users+ endpoint
-        # to get a user's UUID from his/her username.
+        # to retrieve a user's FOLIO record.
         #
         # Params:
         # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
@@ -65,11 +65,11 @@ module CUL
         #
         # Return:
         # A hash containing:
-        # +:folio_id+:: A FOLIO user's UUID string, or nil
+        # +:user+:: A FOLIO user's record, or nil
         # +:code+:: An HTTP response code
         # +:error+:: An error message, or nil
         ##
-        def self.patron_uuid(okapi, tenant, token, username)
+        def self.patron_record(okapi, tenant, token, username)
           url = "#{okapi}/users?query=(username==#{username})"
           headers = {
             'X-Okapi-Tenant' => tenant,
@@ -77,7 +77,7 @@ module CUL
             :accept => 'application/json',
           }
           return_value = {
-            :folio_id => nil,
+            :user => nil,
             :error => nil,
           }
 
@@ -88,7 +88,7 @@ module CUL
             results = JSON.parse(response.body)
             users = results['users']
             if users.count == 1
-              return_value[:folio_id] = users[0]['id']
+              return_value[:user] = users[0]
               return_value[:code] = response.code
             else
               # TODO: This condition should never occur but should be guarded against anyway
@@ -123,10 +123,10 @@ module CUL
           if folio_id.nil?
             # TODO: Add error checking here -- :username could be blank, or the return from
             # patron_uuid could fail
-            folio_id = self.patron_uuid(okapi, tenant, token, identifiers[:username])[:folio_id]
+            folio_id = self.patron_record(okapi, tenant, token, identifiers[:username])[:user]['id']
           end
 
-          url = "#{okapi}/patron/account/#{folio_id}?includeLoans=true&includeHolds=true"
+          url = "#{okapi}/patron/account/#{folio_id}?includeLoans=true&includeHolds=true&includeCharges=true`"
           headers = {
             'X-Okapi-Tenant' => tenant,
             'x-okapi-token' => token,
