@@ -126,7 +126,7 @@ module CUL
             folio_id = self.patron_record(okapi, tenant, token, identifiers[:username])[:user]['id']
           end
 
-          url = "#{okapi}/patron/account/#{folio_id}?includeLoans=true&includeHolds=true&includeCharges=true`"
+          url = "#{okapi}/patron/account/#{folio_id}?includeLoans=true&includeHolds=true&includeCharges=true"
           headers = {
             'X-Okapi-Tenant' => tenant,
             'x-okapi-token' => token,
