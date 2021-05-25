@@ -189,6 +189,75 @@ module CUL
 
           return return_value
         end
+
+        ##
+        # Connects to an Okapi instance and uses the +/circulation/rules/request-policy+ endpoint
+        # and the +/request-policy-storage/request-policies+ endpoint
+        # to determine which request methods can be used for the patron/item/location combination
+        # specified.
+        #
+        # Params:
+        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: An Okapi tenant ID
+        # +token+:: An Okapi token string from a previous authentication call
+        # +patronGroupId+:: A FOLIO patron group UUID
+        # +materialTypeId+:: A FOLIO material type UUID (NOTE that the FOLIO API calls this parameter
+        # "item type")
+        # +loanTypeId+:: A FOLIO loan type UUID
+        # +locationId+:: A FOLIO location UUID
+        #
+        # Return:
+        # A hash containing:
+        # +:request_methods+:: An array of allowed delivery methods. Can include +:hold+, +:recall+, and +:l2l+ 
+        # +:code+:: An HTTP response code
+        # +:error+:: An error message, or nil
+        ##
+        def self.request_options(okapi, tenant, token, patronGroupId, materialTypeId, loanTypeId, locationId)
+          # Step 1: Plug info about the item and patron in to the circ rules calculator to identify which
+          # request policy should be applied
+          url = "#{okapi}/circulation/rules/request-policy?item_type_id=#{materialTypeId}&loan_type_id=#{loanTypeId}&patron_type_id=#{patronGroupId}&location_id=#{locationId}"
+          headers = {
+            'X-Okapi-Tenant' => tenant,
+            'x-okapi-token' => token,
+            :accept => 'application/json',
+          }
+          return_value = {
+            :request_methods => [],
+            :error => nil,
+          }
+
+          begin
+            response = RestClient.get(url, headers)
+            return_value[:code] = response.code
+          rescue RestClient::ExceptionWithResponse => err
+            return_value[:code] = err.response.code
+            return_value[:error] = err.response.body
+            return return_value
+          end
+
+          # Step 2: assuming we got a valid match in Step 1, look up the specified request policy to
+          # get the list of available delivery methods
+          policyId = JSON.parse(response.body)['requestPolicyId']
+          url = "#{okapi}/request-policy-storage/request-policies/#{policyId}"
+          begin
+            response = RestClient.get(url, headers)
+            return_value[:code] = response.code
+          rescue RestClient::ExceptionWithResponse => err
+            return_value[:code] = err.response.code
+            return_value[:error] = err.response.body
+          end
+
+          # Translate the specified request types into symbols
+          type_map = {
+            'Hold' => :hold,
+            'Page' => :l2l,
+            'Recall' => :recall
+          }
+          codes = JSON.parse(response.body)['requestTypes']
+          return_value[:request_methods] = codes.map { |c| type_map[c] }
+
+          return return_value
+        end
     end
   end
 end
