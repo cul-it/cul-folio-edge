@@ -166,9 +166,10 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.renew_item(okapi, tenant, token, username, itemId)
-          userId = self.patron_uuid(okapi, tenant, token, username)[:folio_id]
+          userId = self.patron_record(okapi, tenant, token, username)[:user]['id']
           # TODO: Add error checking here -- :username could be blank, or the return from
           # patron_uuid could fail
+
           url = "#{okapi}/patron/account/#{userId}/item/#{itemId}/renew"
           headers = {
             'X-Okapi-Tenant' => tenant,
@@ -254,7 +255,7 @@ module CUL
             'Recall' => :recall
           }
           codes = JSON.parse(response.body)['requestTypes']
-          return_value[:request_methods] = codes.map { |c| type_map[c] }
+          return_value[:request_methods] = codes ? codes.map { |c| type_map[c] } : []
 
           return return_value
         end
