@@ -166,9 +166,10 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.renew_item(okapi, tenant, token, username, itemId)
-          userId = self.patron_uuid(okapi, tenant, token, username)[:folio_id]
+          userId = self.patron_record(okapi, tenant, token, username)[:user]['id']
           # TODO: Add error checking here -- :username could be blank, or the return from
           # patron_uuid could fail
+
           url = "#{okapi}/patron/account/#{userId}/item/#{itemId}/renew"
           headers = {
             'X-Okapi-Tenant' => tenant,
@@ -254,7 +255,47 @@ module CUL
             'Recall' => :recall
           }
           codes = JSON.parse(response.body)['requestTypes']
-          return_value[:request_methods] = codes.map { |c| type_map[c] }
+          return_value[:request_methods] = codes ? codes.map { |c| type_map[c] } : []
+
+          return return_value
+        end
+        
+        ##
+        # Connects to an Okapi instance and uses the +/inventory/instances+ endpoint
+        # to retrieve an instance record for the specified UUID.
+        #
+        # Params:
+        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: An Okapi tenant ID
+        # +token+:: An Okapi token string from a previous authentication call
+        # +instanceId+:: A FOLIO instance record UUID
+        #
+        # Return:
+        # A hash containing:
+        # +:instance+:: An object representing the instance record
+        # +:code+:: An HTTP response code
+        # +:error+:: An error message, or nil
+        ##
+        def self.instance_record(okapi, tenant, token, instanceId)
+          url = "#{okapi}/inventory/instances/#{instanceId}"
+          headers = {
+            'X-Okapi-Tenant' => tenant,
+            'x-okapi-token' => token,
+            :accept => 'application/json',
+          }
+          return_value = {
+            :instance => nil,
+            :error => nil,
+          }
+
+          begin
+            response = RestClient.get(url, headers)
+            return_value[:instance] = JSON.parse(response.body)
+            return_value[:code] = response.code
+          rescue RestClient::ExceptionWithResponse => err
+            return_value[:code] = err.response.code
+            return_value[:error] = err.response.body
+          end
 
           return return_value
         end
