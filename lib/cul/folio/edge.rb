@@ -91,7 +91,8 @@ module CUL
               return_value[:user] = users[0]
               return_value[:code] = response.code
             else
-              # TODO: This condition should never occur but should be guarded against anyway
+              return_value[:code] = 500
+              return_value[:error] = 'Could\'nt find user record'
             end
           rescue RestClient::ExceptionWithResponse => err
             return_value[:code] = err.response.code
@@ -123,8 +124,19 @@ module CUL
           if folio_id.nil?
             # TODO: Add error checking here -- :username could be blank, or the return from
             # patron_uuid could fail
-            folio_id = self.patron_record(okapi, tenant, token, identifiers[:username])[:user]['id']
+            response = self.patron_record(okapi, tenant, token, identifiers[:username])
+            if response[:code] < 300
+              folio_id = response[:user]['id']
+            else
+              # We don't have an identifier for the user, so there's no point in continuing
+              return {
+                :account => nil,
+                :code => 500,
+                :error => 'Couldn\'t identify user'
+              }
+            end
           end
+
 
           url = "#{okapi}/patron/account/#{folio_id}?includeLoans=true&includeHolds=true&includeCharges=true"
           headers = {
