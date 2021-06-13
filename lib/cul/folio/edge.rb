@@ -311,6 +311,42 @@ module CUL
 
           return return_value
         end
+
+        ##
+        # Connects to an Okapi instance and uses the +/circulation/requests+ endpoint
+        # to cancel an existing FOLIO request.
+        #
+        # Params:
+        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: An Okapi tenant ID
+        # +token+:: An Okapi token string from a previous authentication call
+        # +requestId:: UUID of the request to be cancelled
+        #
+        # Return:
+        # A hash containing:
+        # +:code+:: An HTTP response code
+        # +:error+:: An error message, or nil
+        ##
+        def self.cancel_request(okapi, tenant, token, username, requestId)
+          url = "#{okapi}/circulation/requests/#{requestId}"
+          headers = {
+            'X-Okapi-Tenant' => tenant,
+            'x-okapi-token' => token,
+            :accept => 'application/json',
+          }
+
+          return_value = {}
+          begin
+            response = RestClient.delete(url, headers)
+            return_value[:code] = response.code
+            return_value[:error] = nil
+          rescue RestClient::ExceptionWithResponse => err
+            return_value[:code] = err.response.code
+            return_value[:error] = err.response.body
+          end
+
+          return return_value
+        end
     end
   end
 end
