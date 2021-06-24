@@ -314,6 +314,63 @@ module CUL
 
         ##
         # Connects to an Okapi instance and uses the +/circulation/requests+ endpoint
+        # to create a new FOLIO request.
+        #
+        # Params:
+        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: An Okapi tenant ID
+        # +token+:: An Okapi token string from a previous authentication call
+        # +itemId+:: UUID of the item requested
+        # +requesterId+:: UUID of the requester
+        # +requestType+:: Hold, Recall, or Page
+        # +requestDate+:: String date of the request (e.g., "2017-07-29T22:25:37Z")
+        # +fulfilmentPreference+:: 'Hold Shelf' or Delivery
+        # +servicePointId+:: UUID of the pickup service point
+        # +comments+:: Patron comments (optional)
+        #
+        # Return:
+        # A hash containing:
+        # +:code+:: An HTTP response code
+        # +:error+:: An error message, or nil
+        ##
+        def self.request_item(okapi, tenant, token, itemId, requesterId, requestType, requestDate, fulfilmentPreference, servicePointId, comments = '')
+          url = "#{okapi}/circulation/requests"
+          headers = {
+            'X-Okapi-Tenant' => tenant,
+            'x-okapi-token' => token,
+            :accept => 'application/json',
+          }
+
+          body = {
+            'itemId' => itemId,
+            'requesterId' => requesterId,
+            'requestType' => requestType,
+            'requestDate' => requestDate,
+            'fulfilmentPreference' => fulfilmentPreference,
+            'pickupServicePointId' => servicePointId,
+          }
+
+          if comments != ''
+            body['patronComments'] = comments
+          end
+
+          body = body.to_json
+
+          return_value = {}
+          begin
+            response = RestClient.post(url, body, headers)
+            return_value[:code] = response.code
+            return_value[:error] = nil
+          rescue RestClient::ExceptionWithResponse => err
+            return_value[:code] = err.response.code
+            return_value[:error] = err.response.body
+          end
+
+          return return_value
+        end
+
+        ##
+        # Connects to an Okapi instance and uses the +/circulation/requests+ endpoint
         # to cancel an existing FOLIO request.
         #
         # Params:
