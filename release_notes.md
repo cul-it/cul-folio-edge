@@ -1,5 +1,8 @@
 # Release Notes - cul-folio-edge
 
+## 1.1
+- Return due date with a renewal response
+
 ## 1.0
 (Initial release)
 Provides the following functions:

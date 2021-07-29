@@ -174,6 +174,7 @@ module CUL
         #
         # Return:
         # A hash containing:
+        # +:due_date+:: The new item due date, or nil
         # +:code+:: An HTTP response code
         # +:error+:: An error message, or nil
         ##
@@ -189,12 +190,14 @@ module CUL
             :accept => 'application/json',
           }
           return_value = {
+            :due_date => nil,
             :error => nil,
           }
 
           begin
             response = RestClient.post(url,{}, headers)
             return_value[:code] = response.code
+            return_value[:due_date] = response.body.dueDate
           rescue RestClient::ExceptionWithResponse => err
             return_value[:code] = err.response.code
             return_value[:error] = err.response.body
