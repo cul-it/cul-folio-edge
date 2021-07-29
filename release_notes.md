@@ -2,6 +2,7 @@
 
 ## 1.1
 - Return due date with a renewal response
+- Return renewal error response as JSON
 
 ## 1.0
 (Initial release)
