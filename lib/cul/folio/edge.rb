@@ -197,10 +197,10 @@ module CUL
           begin
             response = RestClient.post(url,{}, headers)
             return_value[:code] = response.code
-            return_value[:due_date] = response.body.dueDate
+            return_value[:due_date] = JSON.parse(response.body)['dueDate']
           rescue RestClient::ExceptionWithResponse => err
             return_value[:code] = err.response.code
-            return_value[:error] = err.response.body
+            return_value[:error] = JSON.parse(err.response.body)
           end
 
           return return_value
