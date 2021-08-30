@@ -1,5 +1,8 @@
 # Release Notes - cul-folio-edge
 
+## 1.2
+- Add service_point function
+
 ## 1.1
 - Return due date with a renewal response
 - Return renewal error response as JSON
