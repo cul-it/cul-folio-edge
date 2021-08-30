@@ -407,6 +407,46 @@ module CUL
 
           return return_value
         end
+
+        ##
+        # Connects to an Okapi instance and uses the +/service-points+ endpoint
+        # to look up a service point based on ID.
+        #
+        # Params:
+        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: An Okapi tenant ID
+        # +token+:: An Okapi token string from a previous authentication call
+        # +spId:: UUID of a service point
+        #
+        # Return:
+        # A hash containing:
+        # +:service_point+:: a hash containing the service point object
+        # +:code+:: An HTTP response code
+        # +:error+:: An error message, or nil
+        ##
+        def self.service_point(okapi, tenant, token, spId)
+          url = "#{okapi}/service-points/#{spId}"
+          headers = {
+            'X-Okapi-Tenant' => tenant,
+            'x-okapi-token' => token,
+            :accept => 'application/json',
+          }
+          return_value = {
+            :service_point => nil,
+            :error => nil,
+          }
+
+          begin
+            response = RestClient.get(url, headers)
+            return_value[:service_point] = JSON.parse(response.body)
+            return_value[:code] = response.code
+          rescue RestClient::ExceptionWithResponse => err
+            return_value[:code] = err.response.code
+            return_value[:error] = err.response.body
+          end
+
+          return return_value
+        end
     end
   end
 end
