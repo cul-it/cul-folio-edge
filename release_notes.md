@@ -1,5 +1,8 @@
 # Release Notes - cul-folio-edge
 
+## 1.2.1
+- Fix bug causing requests to be deleted rather than properly cancelled
+
 ## 1.2
 - Add service_point function
 
