@@ -380,14 +380,15 @@ module CUL
         # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
         # +tenant+:: An Okapi tenant ID
         # +token+:: An Okapi token string from a previous authentication call
-        # +requestId:: UUID of the request to be cancelled
+        # +requestId+:: UUID of the request to be cancelled
+        # +reasonId+:: UUID of a request cancellation reason 
         #
         # Return:
         # A hash containing:
         # +:code+:: An HTTP response code
         # +:error+:: An error message, or nil
         ##
-        def self.cancel_request(okapi, tenant, token, username, requestId)
+        def self.cancel_request(okapi, tenant, token, requestId, reasonId)
           url = "#{okapi}/circulation/requests/#{requestId}"
           headers = {
             'X-Okapi-Tenant' => tenant,
@@ -395,9 +396,38 @@ module CUL
             :accept => 'application/json',
           }
 
+          # This is a bit unfortunate. In order to cancel, we have to make a PUT
+          # request ... but for that, we need the current request object (so we
+          # don't lose the established properties). Since we're only given the
+          # request ID as a param, we'll have to do a lookup first in order to
+          # retrieve the request, then update it -- a two-step process.
+          #
+          # Step 1: retrieval
           return_value = {}
           begin
-            response = RestClient.delete(url, headers)
+            response = RestClient.get(url, headers)
+            return_value[:code] = response.code
+            return_value[:error] = nil
+          rescue RestClient::ExceptionWithResponse => err
+            return_value[:code] = err.response.code
+            return_value[:error] = err.response.body
+            return return_value
+          end
+
+          return return_value if return_value[:code] > 200
+
+          # Step 2: cancellation
+          request = JSON.parse(response.body)
+          # Add cancellation-related fields to the request body
+          request['status'] = 'Closed - Cancelled'
+          request['cancellationReasonId'] = reasonId
+          request['cancelledByUserId'] = request['requesterId']
+          request['cancellationAdditionalInformation'] = 'Cancelled by user in My Account'
+          request['cancelledDate'] = Time.now.utc.iso8601
+
+          return_value = {}
+          begin
+            response = RestClient.put(url, request.to_json, headers)
             return_value[:code] = response.code
             return_value[:error] = nil
           rescue RestClient::ExceptionWithResponse => err
