@@ -380,7 +380,8 @@ module CUL
         # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
         # +tenant+:: An Okapi tenant ID
         # +token+:: An Okapi token string from a previous authentication call
-        # +requestId:: UUID of the request to be cancelled
+        # +requestId+:: UUID of the request to be cancelled
+        # +reasonId+:: UUID of a request cancellation reason 
         #
         # Return:
         # A hash containing:
