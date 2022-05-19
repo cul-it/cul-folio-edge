@@ -1,5 +1,8 @@
 # Release Notes - cul-folio-edge
 
+## 2.0
+- Modify the `request_item` method to add new required parameters for FOLIO Lotus (DISCOVERYACCESS-7496)
+
 ## 1.2.1
 - Fix bug causing requests to be deleted rather than properly cancelled
 
