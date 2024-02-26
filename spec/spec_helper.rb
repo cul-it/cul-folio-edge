@@ -134,8 +134,8 @@ VCR.configure do |c|
   c.before_record do |interaction|
   #   interaction.request.uri.gsub!(ENV['OKAPI_URL'],'<OKAPI URL>')
   # #   #interaction.request.body.string = '<REQUEST BODY>'
-  #   interaction.request.headers.x_okapi_token = '<TOKEN>'
-  #   interaction.request.headers.x_okapi_tenant = '<TENANT>'
+    interaction.request.headers['X-Okapi-Token'] = '<TOKEN>'
+    interaction.request.headers['X-Okapi-Tenant'] = '<TENANT>'
     interaction.request.headers['Host'] = '<HOST>'
   #   interaction.request.headers.authorization
     token = interaction.response.headers['X-Okapi-Token']&.first
