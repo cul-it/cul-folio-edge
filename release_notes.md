@@ -1,5 +1,8 @@
 # Release Notes - cul-folio-edge
 
+## In progress
+- Add RSpec tests
+
 ## 2.0
 - Modify the `request_item` method to add new required parameters for FOLIO Lotus (DISCOVERYACCESS-7496)
 
