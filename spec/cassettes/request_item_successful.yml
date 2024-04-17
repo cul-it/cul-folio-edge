@@ -1,0 +1,44 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: "<OKAPI>/circulation/requests"
+    body:
+      encoding: UTF-8
+      string: '{"instanceId":"33e31b39-c9f1-469a-84bf-ff144e9f594f","holdingsRecordId":"097481bf-dcd5-4745-a66e-f63410285a12","itemId":"397905ac-819f-4bd6-8b2e-32925be9d5b8","requesterId":"53020f20-a1f0-4ef1-b3f3-7a27567f62ec","requestType":"Hold","requestDate":"2024-02-29T22:25:37Z","requestLevel":"Item","fulfilmentPreference":"Hold
+        Shelf","pickupServicePointId":"760beccd-362d-45b6-bfae-639565a877f2"}'
+    headers:
+      Accept:
+      - application/json
+      User-Agent:
+      - rest-client/2.1.0 (darwin21 x86_64) ruby/3.1.2p20
+      X-Okapi-Tenant: "<TENANT>"
+      X-Okapi-Token: "<TOKEN>"
+      Content-Length:
+      - '390'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host: "<HOST>"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Date:
+      - Mon, 26 Feb 2024 20:40:44 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - nginx
+      X-Okapi-Token: "<TOKEN>"
+      Refreshtoken: "<TOKEN>"
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        ewogICJpZCIgOiAiM2QyNjIwZTMtZDZmZS00OTRhLTk0YTAtNmVlMjMxNTgwNzYxIiwKICAicmVxdWVzdExldmVsIiA6ICJJdGVtIiwKICAicmVxdWVzdFR5cGUiIDogIkhvbGQiLAogICJyZXF1ZXN0RGF0ZSIgOiAiMjAyNC0wMi0yOVQyMjoyNTozNy4wMDArMDA6MDAiLAogICJyZXF1ZXN0ZXJJZCIgOiAiNTMwMjBmMjAtYTFmMC00ZWYxLWIzZjMtN2EyNzU2N2Y2MmVjIiwKICAiaW5zdGFuY2VJZCIgOiAiMzNlMzFiMzktYzlmMS00NjlhLTg0YmYtZmYxNDRlOWY1OTRmIiwKICAiaG9sZGluZ3NSZWNvcmRJZCIgOiAiMDk3NDgxYmYtZGNkNS00NzQ1LWE2NmUtZjYzNDEwMjg1YTEyIiwKICAiaXRlbUlkIiA6ICIzOTc5MDVhYy04MTlmLTRiZDYtOGIyZS0zMjkyNWJlOWQ1YjgiLAogICJzdGF0dXMiIDogIk9wZW4gLSBOb3QgeWV0IGZpbGxlZCIsCiAgImluc3RhbmNlIiA6IHsKICAgICJ0aXRsZSIgOiAiSGFycnkgUG90dGVyIDogYSBoaXN0b3J5IG9mIG1hZ2ljLiIsCiAgICAiaWRlbnRpZmllcnMiIDogWyB7CiAgICAgICJpZGVudGlmaWVyVHlwZUlkIiA6ICI4MjYxMDU0Zi1iZTc4LTQyMmQtYmQ1MS00ZWQ5ZjMzYzM0MjIiLAogICAgICAidmFsdWUiIDogIjk3ODE0MDg4OTA3NjkiCiAgICB9LCB7CiAgICAgICJpZGVudGlmaWVyVHlwZUlkIiA6ICI4MjYxMDU0Zi1iZTc4LTQyMmQtYmQ1MS00ZWQ5ZjMzYzM0MjIiLAogICAgICAidmFsdWUiIDogIjE0MDg4OTA3NjMiCiAgICB9LCB7CiAgICAgICJpZGVudGlmaWVyVHlwZUlkIiA6ICI0MzliZmJhZS03NWJjLTRmNzQtOWZjNy1iMmEyZDQ3Y2UzZWYiLAogICAgICAidmFsdWUiIDogIihPQ29MQykxMDExMzI1MDEwIgogICAgfSwgewogICAgICAiaWRlbnRpZmllclR5cGVJZCIgOiAiN2U1OTExOTctZjMzNS00YWZiLWJjNmQtYTZkNzZjYTNiYWNlIiwKICAgICAgInZhbHVlIiA6ICIoUE9PRjIpMTgxNjYiCiAgICB9LCB7CiAgICAgICJpZGVudGlmaWVyVHlwZUlkIiA6ICI3ZTU5MTE5Ny1mMzM1LTRhZmItYmM2ZC1hNmQ3NmNhM2JhY2UiLAogICAgICAidmFsdWUiIDogIjEwNDgzOTU4IgogICAgfSBdLAogICAgImNvbnRyaWJ1dG9yTmFtZXMiIDogWyB7CiAgICAgICJuYW1lIiA6ICJCcml0aXNoIExpYnJhcnkiCiAgICB9IF0sCiAgICAicHVibGljYXRpb24iIDogWyB7CiAgICAgICJwdWJsaXNoZXIiIDogIkJsb29tc2J1cnkgUHVibGlzaGluZyIsCiAgICAgICJwbGFjZSIgOiAiTG9uZG9uIiwKICAgICAgImRhdGVPZlB1YmxpY2F0aW9uIiA6ICIyMDE3IiwKICAgICAgInJvbGUiIDogIlB1YmxpY2F0aW9uIgogICAgfSwgewogICAgICAiZGF0ZU9mUHVibGljYXRpb24iIDogIsKpMjAxNyIKICAgIH0gXQogIH0sCiAgIml0ZW0iIDogewogICAgImJhcmNvZGUiIDogIjMxOTI0MTI1NzIyMzgzIiwKICAgICJsb2NhdGlvbiIgOiB7CiAgICAgICJuYW1lIiA6ICJPbGluIiwKICAgICAgImxpYnJhcnlOYW1lIiA6ICJPbGluIExpYnJhcnkiLAogICAgICAiY29kZSIgOiAib2xpbiIKICAgIH0sCiAgICAic3RhdHVzIiA6ICJDaGVja2VkIG91dCIsCiAgICAiY2FsbE51bWJlciIgOiAiUFI2MDY4Lk85MyBIMzcgMjAxNyIsCiAgICAiY2FsbE51bWJlckNvbXBvbmVudHMiIDogewogICAgICAiY2FsbE51bWJlciIgOiAiUFI2MDY4Lk85MyBIMzcgMjAxNyIsCiAgICAgICJwcmVmaXgiIDogIk92ZXJzaXplIiwKICAgICAgInN1ZmZpeCIgOiAiKyIKICAgIH0sCiAgICAiY29weU51bWJlciIgOiAiMSIKICB9LAogICJyZXF1ZXN0ZXIiIDogewogICAgImxhc3ROYW1lIiA6ICJDb25ub2xseSIsCiAgICAiZmlyc3ROYW1lIiA6ICJNYXR0IiwKICAgICJiYXJjb2RlIiA6ICIyNTUxMDAwMTIxOTY4MjEiLAogICAgInBhdHJvbkdyb3VwSWQiIDogIjM2ODRhNzg2LTY2NzEtNDI2OC04ZWQwLTlkYjgyZWJjYTYwYiIKICB9LAogICJmdWxmaWxtZW50UHJlZmVyZW5jZSIgOiAiSG9sZCBTaGVsZiIsCiAgInBpY2t1cFNlcnZpY2VQb2ludElkIiA6ICI3NjBiZWNjZC0zNjJkLTQ1YjYtYmZhZS02Mzk1NjVhODc3ZjIiLAogICJtZXRhZGF0YSIgOiB7CiAgICAiY3JlYXRlZERhdGUiIDogIjIwMjQtMDItMjZUMjA6NDA6NDQuNTQ3KzAwOjAwIiwKICAgICJjcmVhdGVkQnlVc2VySWQiIDogImU4MTZiZDQxLTkxZGQtNDM3NS1iZTI2LTM0MmYwZjdiODJlMyIsCiAgICAidXBkYXRlZERhdGUiIDogIjIwMjQtMDItMjZUMjA6NDA6NDQuNTQ3KzAwOjAwIiwKICAgICJ1cGRhdGVkQnlVc2VySWQiIDogImU4MTZiZDQxLTkxZGQtNDM3NS1iZTI2LTM0MmYwZjdiODJlMyIKICB9LAogICJwb3NpdGlvbiIgOiAxLAogICJsb2FuIiA6IHsKICAgICJkdWVEYXRlIiA6ICIyMDI0LTA5LTEyVDAzOjU5OjU5LjAwMFoiCiAgfSwKICAicGlja3VwU2VydmljZVBvaW50IiA6IHsKICAgICJuYW1lIiA6ICJPbGluIFNlcnZpY2UgUG9pbnQiLAogICAgImNvZGUiIDogIm9saW4sY2lyYyIsCiAgICAiZGlzY292ZXJ5RGlzcGxheU5hbWUiIDogIk9saW4gTGlicmFyeSIsCiAgICAiZGVzY3JpcHRpb24iIDogbnVsbCwKICAgICJzaGVsdmluZ0xhZ1RpbWUiIDogNDMyMCwKICAgICJwaWNrdXBMb2NhdGlvbiIgOiB0cnVlCiAgfQp9
+  recorded_at: Mon, 26 Feb 2024 20:40:41 GMT
+recorded_with: VCR 6.1.0
