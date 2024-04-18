@@ -24,7 +24,7 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.authenticate(okapi, tenant, username, password)
-          url = "#{okapi}/authn/login"
+          url = "#{okapi}/authn/login-with-expiry"
           headers = {
             'X-Okapi-Tenant' => tenant,
             :accept => 'application/json',
@@ -43,14 +43,19 @@ module CUL
 
           begin
             response = RestClient.post(url, body, headers)
-            return_value[:token] = response.headers[:x_okapi_token]
+            cookies = response.headers[:set_cookie]
+            cookies.each do |cookie|
+              if cookie.start_with?("folioAccessToken=")
+                return_value[:token] = cookie.match(/folioAccessToken=(.*?);/)[1]
+              end  
+            end
             return_value[:code] = response.code
           rescue RestClient::ExceptionWithResponse => err
             return_value[:code] = err.response.code
             return_value[:error] = err.response.body
           end
 
-          return return_value
+          return_value
         end
 
         ##
@@ -355,7 +360,7 @@ module CUL
             'requestType' => requestType,
             'requestDate' => requestDate,
             'requestLevel' => requestLevel,
-            'fulfilmentPreference' => fulfilmentPreference,
+            'fulfillmentPreference' => fulfilmentPreference,
             'pickupServicePointId' => servicePointId,
           }
 

@@ -142,6 +142,7 @@ VCR.configure do |c|
     refreshToken = interaction.response.headers['Refreshtoken']&.first
     interaction.response.body.gsub!(token, '<TOKEN>') if token
     interaction.response.body.gsub!(refreshToken, '<TOKEN>') if refreshToken
+    interaction.response.headers['Set-Cookie'] = '<TOKENS>'
     interaction.response.headers['X-Okapi-Token'] = '<TOKEN>'
     interaction.response.headers['Refreshtoken'] = '<TOKEN>'
   end
