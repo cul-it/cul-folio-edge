@@ -45,7 +45,7 @@ module CUL
             response = RestClient.post(url, body, headers)
             cookies = response.headers[:set_cookie]
             cookies.each do |cookie|
-              if cookie.start_with?("folioAccessToken=")
+              if cookie.start_with?('folioAccessToken=')
                 return_value[:token] = cookie.match(/folioAccessToken=(.*?);/)[1]
               end  
             end
