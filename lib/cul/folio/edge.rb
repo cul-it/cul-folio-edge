@@ -26,6 +26,7 @@ module CUL
         # Return:
         # A hash containing:
         # +:token+:: An Okapi Access Token, or nil
+        # +:token_exp+:: The expiration date of the token, or nil
         # +:code+:: An HTTP response code
         # +:error+:: An error message, or nil
         ##
@@ -55,8 +56,9 @@ module CUL
             cookies.each do |cookie|
               if cookie.start_with?('folioAccessToken=')
                 return_value[:token] = cookie.match(/folioAccessToken=(.*?);/)[1]
+                return_value[:token_exp] = JSON.parse(response.body)['accessTokenExpiration']
                 break
-              end  
+              end
             end
             return_value[:code] = response.code
           rescue RestClient::ExceptionWithResponse => err
