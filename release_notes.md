@@ -1,6 +1,7 @@
 # Release Notes - cul-folio-edge
 
 ## In progress
+- Folio Token changes
 - Add RSpec tests
 
 ## 2.0
