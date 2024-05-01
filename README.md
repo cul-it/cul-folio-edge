@@ -19,7 +19,7 @@ The wrapped methods include:
 
 Most of the methods are centered around the needs of discovery systems to retrieve patron account details and to request library materials.
 
-Version 2.0.1 and higher of CUL::FOLIO::Edge requires FOLIO's Poppy release or above -- more specificially, `mod-circulation` v. 24.0 or higher.
+Version 3.0 and higher of CUL::FOLIO::Edge requires FOLIO's Poppy release or above -- more specificially, `mod-circulation` v. 24.0 or higher.
 
 ## Installation
 

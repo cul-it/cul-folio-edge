@@ -1,6 +1,6 @@
 # Release Notes - cul-folio-edge
 
-## 2.0.1
+## 3.0
 - Update the `request_item` method for FOLIO Poppy change to spelling of `fulfillmentPreference` (DACCESS-207)
 - Add basic test setup using RSpec, VCR, and initial tests (cf. DACCESS-97)
 
