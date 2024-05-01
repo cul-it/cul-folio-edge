@@ -1,0 +1,50 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: "<OKAPI>/authn/login"
+    body:
+      encoding: UTF-8
+      string: '{"username":"<USER>","password":"<PW>"}'
+    headers:
+      Accept:
+      - application/json
+      User-Agent:
+      - rest-client/2.1.0 (darwin21 x86_64) ruby/3.1.2p20
+      X-Okapi-Tenant:
+      - "<TENANT>"
+      X-Forwarded-For:
+      - Stripes
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '62'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host: "<HOST>"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Date:
+      - Thu, 22 Feb 2024 21:12:21 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - nginx
+      X-Okapi-Token: "<TOKEN>"
+      Refreshtoken: "<TOKEN>"
+    body:
+      encoding: ASCII-8BIT
+      string: |-
+        {
+          "okapiToken" : "<TOKEN>",
+          "refreshToken" : "<TOKEN>"
+        }
+  recorded_at: Thu, 22 Feb 2024 21:12:21 GMT
+recorded_with: VCR 6.1.0

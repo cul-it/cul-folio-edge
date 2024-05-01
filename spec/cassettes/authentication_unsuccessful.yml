@@ -1,0 +1,57 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: "<OKAPI>/authn/login"
+    body:
+      encoding: UTF-8
+      string: '{"username":"George","password":"letmein"}'
+    headers:
+      Accept:
+      - application/json
+      User-Agent:
+      - rest-client/2.1.0 (darwin21 x86_64) ruby/3.1.2p20
+      X-Okapi-Tenant:
+      - "<TENANT>"
+      X-Forwarded-For:
+      - Stripes
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '42'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host: "<HOST>"
+  response:
+    status:
+      code: 422
+      message: Unprocessable Entity
+    headers:
+      Date:
+      - Thu, 22 Feb 2024 21:14:25 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - nginx
+      X-Okapi-Token: "<TOKEN>"
+      Refreshtoken: "<TOKEN>"
+    body:
+      encoding: ASCII-8BIT
+      string: |-
+        {
+          "errors" : [ {
+            "message" : "Error verifying user existence: No user found by username George",
+            "type" : "error",
+            "code" : "username.incorrect",
+            "parameters" : [ {
+              "key" : "username",
+              "value" : "George"
+            } ]
+          } ]
+        }
+  recorded_at: Thu, 22 Feb 2024 21:14:25 GMT
+recorded_with: VCR 6.1.0

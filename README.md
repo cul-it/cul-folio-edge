@@ -1,8 +1,25 @@
-# Cul::Folio::Edge
+# CUL::FOLIO::Edge
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/cul/folio/edge`. To experiment with that code, run `bin/console` for an interactive prompt.
+CUL::FOLIO::Edge is a Ruby wrapper for several [FOLIO](https://folio.org) APIs, originally developed for use with [Cornell University Library](https://library.cornell.edu)'s [Blacklight](https://projectblacklight.org) catalog.
 
-TODO: Delete this and the text above, and describe your gem
+The wrapped methods include:
+
+| method | FOLIO API endpoint |
+| ------ | ----- |
+| authenticate | /authn/login |
+| patron_record | /users |
+| patron_account | /patron/account |
+| renew_item | /patron/account |
+| request_options | /circulation/rules/request-policy |
+| | /request-policy-storage/request-policies |
+| instance_record | /inventory/instances |
+| request_item | /circulation/requests |
+| cancel_request | /circulation/requests |
+| service_point | /service-points |
+
+Most of the methods are centered around the needs of discovery systems to retrieve patron account details and to request library materials.
+
+Version 3.0 and higher of CUL::FOLIO::Edge requires FOLIO's Poppy release or above -- more specificially, `mod-circulation` v. 24.0 or higher.
 
 ## Installation
 
