@@ -329,7 +329,7 @@ module CUL
         # +requesterId+:: UUID of the requester
         # +requestType+:: Hold, Recall, or Page
         # +requestDate+:: String date of the request (e.g., "2017-07-29T22:25:37Z")
-        # +fulfilmentPreference+:: 'Hold Shelf' or 'Delivery'
+        # +fulfillmentPreference+:: 'Hold Shelf' or 'Delivery'
         # +servicePointId+:: UUID of the pickup service point
         # +comments+:: Patron comments (optional)
         # +requestLevel+:: 'Item' (optional, added now for future-proofing; eventually there will be another choice for title-level requests)
@@ -339,7 +339,7 @@ module CUL
         # +:code+:: An HTTP response code
         # +:error+:: An error message, or nil
         ##
-        def self.request_item(okapi, tenant, token, instanceId, holdingsId, itemId, requesterId, requestType, requestDate, fulfilmentPreference, servicePointId, comments = '', requestLevel = 'Item')
+        def self.request_item(okapi, tenant, token, instanceId, holdingsId, itemId, requesterId, requestType, requestDate, fulfillmentPreference, servicePointId, comments = '', requestLevel = 'Item')
           url = "#{okapi}/circulation/requests"
           headers = {
             'X-Okapi-Tenant' => tenant,
@@ -355,7 +355,7 @@ module CUL
             'requestType' => requestType,
             'requestDate' => requestDate,
             'requestLevel' => requestLevel,
-            'fulfilmentPreference' => fulfilmentPreference,
+            'fulfillmentPreference' => fulfillmentPreference,
             'pickupServicePointId' => servicePointId,
           }
 
