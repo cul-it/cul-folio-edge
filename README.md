@@ -6,7 +6,7 @@ The wrapped methods include:
 
 | method | FOLIO API endpoint |
 | ------ | ----- |
-| authenticate | /authn/login |
+| authenticate | /authn/login-with-expiry |
 | patron_record | /users |
 | patron_account | /patron/account |
 | renew_item | /patron/account |

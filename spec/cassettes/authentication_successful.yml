@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: post
-    uri: "<OKAPI>/authn/login"
+    uri: "<OKAPI>/authn/login-with-expiry"
     body:
       encoding: UTF-8
       string: '{"username":"<USER>","password":"<PW>"}'
@@ -10,9 +10,8 @@ http_interactions:
       Accept:
       - application/json
       User-Agent:
-      - rest-client/2.1.0 (darwin21 x86_64) ruby/3.1.2p20
-      X-Okapi-Tenant:
-      - "<TENANT>"
+      - rest-client/2.1.0 (darwin23 x86_64) ruby/3.1.2p20
+      X-Okapi-Tenant: "<TENANT>"
       X-Forwarded-For:
       - Stripes
       Content-Type:
@@ -22,13 +21,14 @@ http_interactions:
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Host: "<HOST>"
+      X-Okapi-Token: "<TOKEN>"
   response:
     status:
       code: 201
       message: Created
     headers:
       Date:
-      - Thu, 22 Feb 2024 21:12:21 GMT
+      - Thu, 18 Apr 2024 14:30:37 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,14 +37,11 @@ http_interactions:
       - keep-alive
       Server:
       - nginx
+      Set-Cookie: folioAccessToken=<TOKEN>; folioRefreshToken=<TOKEN2>
       X-Okapi-Token: "<TOKEN>"
       Refreshtoken: "<TOKEN>"
     body:
       encoding: ASCII-8BIT
-      string: |-
-        {
-          "okapiToken" : "<TOKEN>",
-          "refreshToken" : "<TOKEN>"
-        }
-  recorded_at: Thu, 22 Feb 2024 21:12:21 GMT
-recorded_with: VCR 6.1.0
+      string: '{"accessTokenExpiration":"2024-04-18T15:30:37Z","refreshTokenExpiration":"2024-04-18T15:30:37Z"}'
+  recorded_at: Thu, 18 Apr 2024 14:30:37 GMT
+recorded_with: VCR 6.2.0
