@@ -32,6 +32,7 @@ RSpec.configure do |config|
     # ...rather than:
     #     # => "be bigger than 2"
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
+    expectations.on_potential_false_positives = :nothing
   end
 
   # rspec-mocks config goes here. You can use an alternate test double
@@ -142,6 +143,7 @@ VCR.configure do |c|
     refreshToken = interaction.response.headers['Refreshtoken']&.first
     interaction.response.body.gsub!(token, '<TOKEN>') if token
     interaction.response.body.gsub!(refreshToken, '<TOKEN>') if refreshToken
+    interaction.response.headers['Set-Cookie'] = 'folioAccessToken=<TOKEN>; folioRefreshToken=<TOKEN2>'
     interaction.response.headers['X-Okapi-Token'] = '<TOKEN>'
     interaction.response.headers['Refreshtoken'] = '<TOKEN>'
   end

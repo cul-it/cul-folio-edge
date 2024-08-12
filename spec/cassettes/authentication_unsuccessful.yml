@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: post
-    uri: "<OKAPI>/authn/login"
+    uri: "<OKAPI>/authn/login-with-expiry"
     body:
       encoding: UTF-8
       string: '{"username":"George","password":"letmein"}'
@@ -10,9 +10,8 @@ http_interactions:
       Accept:
       - application/json
       User-Agent:
-      - rest-client/2.1.0 (darwin21 x86_64) ruby/3.1.2p20
-      X-Okapi-Tenant:
-      - "<TENANT>"
+      - rest-client/2.1.0 (darwin23 x86_64) ruby/3.1.2p20
+      X-Okapi-Tenant: "<TENANT>"
       X-Forwarded-For:
       - Stripes
       Content-Type:
@@ -22,13 +21,14 @@ http_interactions:
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Host: "<HOST>"
+      X-Okapi-Token: "<TOKEN>"
   response:
     status:
       code: 422
       message: Unprocessable Entity
     headers:
       Date:
-      - Thu, 22 Feb 2024 21:14:25 GMT
+      - Thu, 18 Apr 2024 14:30:37 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,6 +37,7 @@ http_interactions:
       - keep-alive
       Server:
       - nginx
+      Set-Cookie: folioAccessToken=<TOKEN>; folioRefreshToken=<TOKEN2>
       X-Okapi-Token: "<TOKEN>"
       Refreshtoken: "<TOKEN>"
     body:
@@ -53,5 +54,5 @@ http_interactions:
             } ]
           } ]
         }
-  recorded_at: Thu, 22 Feb 2024 21:14:25 GMT
-recorded_with: VCR 6.1.0
+  recorded_at: Thu, 18 Apr 2024 14:30:37 GMT
+recorded_with: VCR 6.2.0

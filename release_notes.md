@@ -1,5 +1,9 @@
 # Release Notes - cul-folio-edge
 
+## [3.1] - 2024-08-12
+### Changed
+- Updated the `authenticate` method to use the new token rotation/refresh system implemented in Quesnalia, Ransoms, and higher (DACCESS-261)
+
 ## 3.0
 - Update the `request_item` method for FOLIO Poppy change to spelling of `fulfillmentPreference` (DACCESS-207)
 - Add basic test setup using RSpec, VCR, and initial tests (cf. DACCESS-97)
