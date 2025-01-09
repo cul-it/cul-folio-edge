@@ -13,7 +13,7 @@
 - Add basic test setup using RSpec, VCR, and initial tests (cf. DACCESS-97)
 - Update README
 
-## 2.0
+## 2.0d
 - Modify the `request_item` method to add new required parameters for FOLIO Lotus (DISCOVERYACCESS-7496)
 
 ## 1.2.1
