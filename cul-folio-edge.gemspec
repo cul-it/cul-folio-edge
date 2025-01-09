@@ -6,8 +6,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Matthew Connolly"]
   spec.email         = ["mjc12@cornell.edu"]
 
-  spec.summary       = "Connect to FOLIO Edge APIs"
-  spec.description   = "Connect to FOLIO Edge APIs"
+  spec.summary       = "Connect to FOLIO APIs"
+  spec.description   = "Connect to FOLIO APIs"
   spec.homepage      = "https://www.library.cornell.edu"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
 

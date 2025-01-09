@@ -1,5 +1,9 @@
 # Release Notes - cul-folio-edge
 
+## [3.2] - 2025-01-09
+### Changed
+- Updated the `authenticate` method to support both new and old token systems in FOLIO (DACCESS-459)
+
 ## [3.1] - 2024-08-12
 ### Changed
 - Updated the `authenticate` method to use the new token rotation/refresh system implemented in Quesnalia, Ransoms, and higher (DACCESS-261)
@@ -9,7 +13,7 @@
 - Add basic test setup using RSpec, VCR, and initial tests (cf. DACCESS-97)
 - Update README
 
-## 2.0
+## 2.0d
 - Modify the `request_item` method to add new required parameters for FOLIO Lotus (DISCOVERYACCESS-7496)
 
 ## 1.2.1
