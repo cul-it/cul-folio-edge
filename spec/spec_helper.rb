@@ -125,6 +125,10 @@ VCR.configure do |c|
   c.filter_sensitive_data('<TENANT>') { ENV['OKAPI_TENANT'] }
   c.filter_sensitive_data('<USER>') { ENV['OKAPI_USER'] }
   c.filter_sensitive_data('<PW>') { ENV['OKAPI_PW'] }
+  c.filter_sensitive_data('<OKAPI_OLD>') { ENV['OLD_OKAPI_URL'] }
+  c.filter_sensitive_data('<TENANT_OLD>') { ENV['OLD_OKAPI_TENANT'] }
+  c.filter_sensitive_data('<USER_OLD>') { ENV['OLD_OKAPI_USER'] }
+  c.filter_sensitive_data('<PW_OLD>') { ENV['OLD_OKAPI_PW'] }
   # c.filter_sensitive_data('<TOKEN>') { ENV['TOKEN'] }
   # # Some of the responses include UUIDs that are unique to each request. We
   # # don't want to record these in the cassettes, so we'll filter them out.
