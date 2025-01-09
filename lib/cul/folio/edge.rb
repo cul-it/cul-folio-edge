@@ -8,20 +8,15 @@ module CUL
       class Error < StandardError; end
 
         ##
-        # Connects to an Okapi instance and uses the +/authn/login-with-expiry+ endpoint
-        # to authenticate the user. This version of the method is intended for use with
-        # FOLIO's new Refresh Token Rotation approach to authentication, which is detailed
-        # at https://folio-org.atlassian.net/wiki/spaces/FOLIJET/pages/1396980/Refresh+Token+Rotation+RTR.
-        #
-        # Note that the return value ignores the refresh token that FOLIO provides. Since this library
-        # is intended for short-lived interactions with FOLIO, the refresh token is not needed. The access
-        # token should have a sufficient TTL for the duration of the interaction.
+        # Connects to an Okapi instance and uses an authentication endpoint
+        # to authenticate the user. 
         #
         # Params:
         # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
         # +tenant+:: FOLIO/OKAPI tenant ID
         # +username+:: Username
         # +password+:: Password
+        # +method+:: :new or :old, specifying which authentication scheme is used by the Okapi instance
         #
         # Return:
         # A hash containing:
@@ -30,8 +25,7 @@ module CUL
         # +:code+:: An HTTP response code
         # +:error+:: An error message, or nil
         ##
-        def self.authenticate(okapi, tenant, username, password)
-          url = "#{okapi}/authn/login-with-expiry"
+        def self.authenticate(okapi, tenant, username, password, method = :new)
           headers = {
             'X-Okapi-Tenant' => tenant,
             :accept => 'application/json',
@@ -43,30 +37,11 @@ module CUL
             'password' => password
           }.to_json
 
-          return_value = {
-            :token => nil,
-            :error => nil,
-          }
-
-          begin
-            # A successful login will return a 201 with a Set-Cookie header that includes both the Access Token
-            # and the Refresh Token. We're only interested in the Access Token, so we'll parse that out from Set-Cookie.
-            response = RestClient.post(url, body, headers)
-            cookies = response.headers[:set_cookie]
-            cookies.each do |cookie|
-              if cookie.start_with?('folioAccessToken=')
-                return_value[:token] = cookie.match(/folioAccessToken=(.*?);/)[1]
-                return_value[:token_exp] = JSON.parse(response.body)['accessTokenExpiration']
-                break
-              end
-            end
-            return_value[:code] = response.code
-          rescue RestClient::ExceptionWithResponse => err
-            return_value[:code] = err.response.code
-            return_value[:error] = err.response.body
+          if method == :new
+            self.authenticate_new(okapi, headers, body)
+          else
+            self.authenticate_old(okapi, headers, body)
           end
-
-          return_value
         end
 
         ##
@@ -498,6 +473,73 @@ module CUL
           end
 
           return return_value
+        end
+
+        private
+
+        # Private methods to handle the two different approaches to authentication
+        # that FOLIO has used. The first method is the older one, which uses the
+        # +/authn/login+ endpoint. The second method is the newer one, which uses
+        # the +/authn/login-with-expiry+ endpoint. The newer method uses FOLIO's
+        # Refresh Token Rotation approach to authentication.
+ 
+        # This first version of the authentication method is intended for use with the 'classic'
+        # FOLIO authentication method, which returns an access token that has an indefinite
+        # TTL. This method is deprecated in favor of the newer method, which uses Refresh Token
+        # Rotation, but is still included here for backwards compatibility with systems that
+        # haven't upgraded FOLIO.
+        def self.authenticate_old(okapi_url, headers, body)
+          url = "#{okapi_url}/authn/login"
+          return_value = {
+            :token => nil,
+            :error => nil,
+          }
+
+          begin
+            response = RestClient.post(url, body, headers)
+            return_value[:token] = response.headers[:x_okapi_token]
+            return_value[:code] = response.code
+          rescue RestClient::ExceptionWithResponse => err
+            return_value[:code] = err.response.code
+            return_value[:error] = err.response.body
+          end
+
+          return_value
+        end        
+
+        # This version of the authentication method is intended for use with
+        # FOLIO's new Refresh Token Rotation approach to authentication, which is detailed
+        # at https://folio-org.atlassian.net/wiki/spaces/FOLIJET/pages/1396980/Refresh+Token+Rotation+RTR.
+        #
+        # Note that the return value ignores the refresh token that FOLIO provides. Since this library
+        # is intended for short-lived interactions with FOLIO, the refresh token is not needed. The access
+        # token should have a sufficient TTL for the duration of the interaction.
+        def self.authenticate_new(okapi_url, headers, body)
+          url = "#{okapi_url}/authn/login-with-expiry"
+          return_value = {
+            :token => nil,
+            :error => nil,
+          }
+
+          begin
+            # A successful login will return a 201 with a Set-Cookie header that includes both the Access Token
+            # and the Refresh Token. We're only interested in the Access Token, so we'll parse that out from Set-Cookie.
+            response = RestClient.post(url, body, headers)
+            cookies = response.headers[:set_cookie]
+            cookies.each do |cookie|
+              if cookie.start_with?('folioAccessToken=')
+                return_value[:token] = cookie.match(/folioAccessToken=(.*?);/)[1]
+                return_value[:token_exp] = JSON.parse(response.body)['accessTokenExpiration']
+                break
+              end
+            end
+            return_value[:code] = response.code
+          rescue RestClient::ExceptionWithResponse => err
+            return_value[:code] = err.response.code
+            return_value[:error] = err.response.body
+          end
+
+          return_value 
         end
     end
   end
