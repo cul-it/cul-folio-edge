@@ -25,7 +25,7 @@ module CUL
         # +:code+:: An HTTP response code
         # +:error+:: An error message, or nil
         ##
-        def self.authenticate(okapi, tenant, username, password, method = :new)
+        def self.authenticate(okapi, tenant, username, password, method: :new)
           headers = {
             'X-Okapi-Tenant' => tenant,
             :accept => 'application/json',
