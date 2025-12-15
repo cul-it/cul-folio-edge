@@ -370,13 +370,13 @@ module CUL
         end
 
         ##
-        # Connects to an Okapi instance and uses the +/circulation/requests+ endpoint
+        # Connects to an Kong API gateway and uses the +/circulation/requests+ endpoint
         # to cancel an existing FOLIO request.
         #
         # Params:
-        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
-        # +tenant+:: An Okapi tenant ID
-        # +token+:: An Okapi token string from a previous authentication call
+        # +okapi+:: URL of the Kong instance
+        # +tenant+:: A tenant ID required in the header by Kong 
+        # +token+:: An authentication token string from a previous call
         # +requestId+:: UUID of the request to be cancelled
         # +reasonId+:: UUID of a request cancellation reason 
         #
@@ -414,13 +414,27 @@ module CUL
           return return_value if return_value[:code] > 200
 
           # Step 2: cancellation
-          request = JSON.parse(response.body)
+          request_data = JSON.parse(response.body)
+
           # Add cancellation-related fields to the request body
-          request['status'] = 'Closed - Cancelled'
-          request['cancellationReasonId'] = reasonId
-          request['cancelledByUserId'] = request['requesterId']
-          request['cancellationAdditionalInformation'] = 'Cancelled by user in My Account'
-          request['cancelledDate'] = Time.now.utc.iso8601
+          request = {
+            'id' => request_data['id'],
+            'status' => 'Closed - Cancelled',
+            'cancellationReasonId' => reasonId,
+            'cancelledByUserId' => request_data['requesterId'],
+            'cancellationAdditionalInformation' => 'Cancelled by user in My Account',
+            'cancelledDate' => Time.now.utc.iso8601,
+            'requestLevel' => request_data['requestLevel'] || 'Item',
+            'fulfillmentPreference' => request_data['fulfillmentPreference'],
+            'instanceId' => request_data['instanceId'],
+            'itemId' => request_data['itemId'],
+            'holdingsRecordId' => request_data['holdingsRecordId'],
+            'requestDate' => request_data['requestDate'],
+            'pickupServicePointId' => request_data['pickupServicePointId'],
+            'patronComments' => request_data['patronComments'],
+            'requesterId' => request_data['requesterId'],
+            'requestType' => request_data['requestType']
+          }
 
           return_value = {}
           begin
