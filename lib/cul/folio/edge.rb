@@ -370,12 +370,12 @@ module CUL
         end
 
         ##
-        # Connects to an Kong API gateway and uses the +/circulation/requests+ endpoint
+        # Connects to a FOLIO API gateway and uses the +/circulation/requests+ endpoint
         # to cancel an existing FOLIO request.
         #
         # Params:
-        # +okapi+:: URL of the Kong instance
-        # +tenant+:: A tenant ID required in the header by Kong 
+        # +okapi+:: URL of the FOLIO instance
+        # +tenant+:: A tenant ID required in the header by FOLIO 
         # +token+:: An authentication token string from a previous call
         # +requestId+:: UUID of the request to be cancelled
         # +reasonId+:: UUID of a request cancellation reason 
