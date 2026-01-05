@@ -1,5 +1,9 @@
 # Release Notes - cul-folio-edge
 
+## [3.3] - 2026-01-05
+### Changed
+- Upcoming Sunflower Folio change, we are moving from Okapi to Kong. Updated the `cancel` method to support Kong's smaller payload (DACCESS-673)
+
 ## [3.2] - 2025-01-09
 ### Changed
 - Updated the `authenticate` method to support both new and old token systems in FOLIO (DACCESS-459)
