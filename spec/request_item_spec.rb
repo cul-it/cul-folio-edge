@@ -1,56 +1,83 @@
-require 'spec_helper'
 require 'cul/folio/edge'
+require 'rest-client'
+require 'support/shared_contexts'
 
-describe CUL::FOLIO::Edge do
-  describe ".request_item" do
-    let(:okapi) { ENV['OKAPI_URL'] }
-    let(:tenant) { ENV['OKAPI_TENANT'] }
-    let(:token) { ENV['OKAPI_TOKEN'] }
-
-    # The item metadata is for this record: https://catalog.library.cornell.edu/catalog/10483958
-    let(:instanceId) { '33e31b39-c9f1-469a-84bf-ff144e9f594f' }
-    let(:holdingsId) { '097481bf-dcd5-4745-a66e-f63410285a12' }
-    let(:itemId) { '397905ac-819f-4bd6-8b2e-32925be9d5b8' }
-    let(:requesterId) { ENV['USER_UUID'] }
+RSpec.describe CUL::FOLIO::Edge do
+  include_context 'FOLIO Edge API setup'
+  describe '.request_item' do
+    let(:instanceId) { 'instance-123' }
+    let(:holdingsId) { 'holdings-456' }
+    let(:itemId) { 'item-789' }
+    let(:requesterId) { 'user-111' }
     let(:requestType) { 'Hold' }
-    let(:requestDate) { '2024-02-29T22:25:37Z' }
-    let(:fulfilmentPreference) { 'Hold Shelf' }
-    let(:servicePointId) { '760beccd-362d-45b6-bfae-639565a877f2' } # Olin Library
-    let(:comments) { '' }
+    let(:requestDate) { '2026-01-06T12:00:00Z' }
+    let(:fulfillmentPreference) { 'Hold Shelf' }
+    let(:servicePointId) { 'sp-222' }
+    let(:comments) { 'Please hold for pickup' }
     let(:requestLevel) { 'Item' }
+    let(:url) { "#{okapi}/circulation/requests" }
+    let(:body_hash) do
+      {
+        'instanceId' => instanceId,
+        'holdingsRecordId' => holdingsId,
+        'itemId' => itemId,
+        'requesterId' => requesterId,
+        'requestType' => requestType,
+        'requestDate' => requestDate,
+        'requestLevel' => requestLevel,
+        'fulfillmentPreference' => fulfillmentPreference,
+        'pickupServicePointId' => servicePointId,
+        'patronComments' => comments
+      }
+    end
+    let(:body_json) { body_hash.to_json }
 
+    context 'when the request is successful' do
+      let(:response_double) { double('response', code: 201, body: '{}') }
 
-    describe '.request_item' do
-      it 'returns a 201 and no errors for a successful request' do
-        VCR.use_cassette('request_item_successful') do
-          response = CUL::FOLIO::Edge.request_item(
-            okapi,
-            tenant,
-            token,
-            instanceId,
-            holdingsId,
-            itemId,
-            requesterId,
-            requestType,
-            requestDate,
-            fulfilmentPreference,
-            servicePointId,
-            comments,
-            requestLevel
-          )
-          expect(response[:code]).to eq(201)
-          expect(response[:error]).to be_nil
-        end
+      it 'returns code 201 and no error' do
+        allow(RestClient).to receive(:post).with(url, body_json, default_headers).and_return(response_double)
+        result = described_class.request_item(okapi, tenant, token, instanceId, holdingsId, itemId, requesterId, requestType, requestDate, fulfillmentPreference, servicePointId, comments, requestLevel)
+        expect(result[:code]).to eq(201)
+        expect(result[:error]).to be_nil
       end
+    end
 
-      # For VCR recording purposes, we don't need to change any values for the second request. Since
-      # a request for the same item by the same borrower will fail, we can use the same values here.
-      it 'returns a higher HTTP response and an error for an unsuccessful request' do
-        VCR.use_cassette('request_item_error') do
-          response = CUL::FOLIO::Edge.request_item(okapi, tenant, token, instanceId, holdingsId, itemId, requesterId, requestType, requestDate, fulfilmentPreference, servicePointId, comments, requestLevel)
-          expect(response[:code]).to be > 300
-          expect(response[:error]).not_to be_nil
-        end
+    context 'when the request fails' do
+      let(:error_response) { double('response', code: 422, body: 'Invalid request') }
+      let(:exception) { RestClient::ExceptionWithResponse.new(error_response) }
+
+      it 'returns the error code and message' do
+        allow(RestClient).to receive(:post).with(url, body_json, default_headers).and_raise(exception)
+        result = described_class.request_item(okapi, tenant, token, instanceId, holdingsId, itemId, requesterId, requestType, requestDate, fulfillmentPreference, servicePointId, comments, requestLevel)
+        expect(result[:code]).to eq(422)
+        expect(result[:error]).to eq('Invalid request')
+      end
+    end
+
+    context 'when comments are blank' do
+      let(:comments) { '' }
+      let(:body_hash) do
+        {
+          'instanceId' => instanceId,
+          'holdingsRecordId' => holdingsId,
+          'itemId' => itemId,
+          'requesterId' => requesterId,
+          'requestType' => requestType,
+          'requestDate' => requestDate,
+          'requestLevel' => requestLevel,
+          'fulfillmentPreference' => fulfillmentPreference,
+          'pickupServicePointId' => servicePointId
+        }
+      end
+      let(:body_json) { body_hash.to_json }
+      let(:response_double) { double('response', code: 201, body: '{}') }
+
+      it 'does not include patronComments in the body' do
+        allow(RestClient).to receive(:post).with(url, body_json, default_headers).and_return(response_double)
+        result = described_class.request_item(okapi, tenant, token, instanceId, holdingsId, itemId, requesterId, requestType, requestDate, fulfillmentPreference, servicePointId, comments, requestLevel)
+        expect(result[:code]).to eq(201)
+        expect(result[:error]).to be_nil
       end
     end
   end
