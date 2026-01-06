@@ -1,10 +1,10 @@
 require 'cul/folio/edge'
 require 'rest-client'
+require 'support/shared_contexts'
 
 describe CUL::FOLIO::Edge do
+  include_context 'FOLIO Edge API setup'
   describe '.authenticate' do
-    let(:okapi) { 'https://folio.example.com' }
-    let(:tenant) { 'test_tenant' }
     let(:username) { 'testuser' }
     let(:password) { 'secret' }
     let(:headers) do

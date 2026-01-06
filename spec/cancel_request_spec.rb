@@ -1,21 +1,13 @@
 require 'cul/folio/edge'
 require 'rest-client'
+require 'support/shared_contexts'
 require 'time'
 
 RSpec.describe CUL::FOLIO::Edge do
+  include_context 'FOLIO Edge API setup'
   describe '.cancel_request' do
-    let(:okapi) { 'https://folio.example.com' }
-    let(:tenant) { 'test_tenant' }
-    let(:token) { 'test_token' }
     let(:requestId) { 'request-123' }
     let(:reasonId) { 'reason-456' }
-    let(:headers) do
-      {
-        'X-Okapi-Tenant' => tenant,
-        'x-okapi-token' => token,
-        :accept => 'application/json',
-      }
-    end
     let(:url) { "#{okapi}/circulation/requests/#{requestId}" }
     let(:request_data) do
       {
@@ -57,8 +49,8 @@ RSpec.describe CUL::FOLIO::Edge do
 
     context 'when both GET and PUT succeed' do
       it 'returns code 204 and no error' do
-        allow(RestClient).to receive(:get).with(url, headers).and_return(get_response)
-        allow(RestClient).to receive(:put).with(url, satisfy { |body, _| JSON.parse(body).merge('cancelledDate' => kind_of(String)) }, headers).and_return(put_response)
+        allow(RestClient).to receive(:get).with(url, default_headers).and_return(get_response)
+        allow(RestClient).to receive(:put).with(url, satisfy { |body, _| JSON.parse(body).merge('cancelledDate' => kind_of(String)) }, default_headers).and_return(put_response)
         result = described_class.cancel_request(okapi, tenant, token, requestId, reasonId)
         expect(result[:code]).to eq(204)
         expect(result[:error]).to be_nil
@@ -70,7 +62,7 @@ RSpec.describe CUL::FOLIO::Edge do
       let(:exception) { RestClient::ExceptionWithResponse.new(error_response) }
 
       it 'returns the error code and message from GET' do
-        allow(RestClient).to receive(:get).with(url, headers).and_raise(exception)
+        allow(RestClient).to receive(:get).with(url, default_headers).and_raise(exception)
         result = described_class.cancel_request(okapi, tenant, token, requestId, reasonId)
         expect(result[:code]).to eq(404)
         expect(result[:error]).to eq('Not found')
@@ -81,7 +73,7 @@ RSpec.describe CUL::FOLIO::Edge do
       let(:get_response) { double('response', code: 400, body: 'Bad request') }
 
       it 'returns the error code from GET' do
-        allow(RestClient).to receive(:get).with(url, headers).and_return(get_response)
+        allow(RestClient).to receive(:get).with(url, default_headers).and_return(get_response)
         result = described_class.cancel_request(okapi, tenant, token, requestId, reasonId)
         expect(result[:code]).to eq(400)
         expect(result[:error]).to be_nil
@@ -93,8 +85,8 @@ RSpec.describe CUL::FOLIO::Edge do
       let(:exception) { RestClient::ExceptionWithResponse.new(error_response) }
 
       it 'returns the error code and message from PUT' do
-        allow(RestClient).to receive(:get).with(url, headers).and_return(get_response)
-        allow(RestClient).to receive(:put).with(url, satisfy { |body, _| JSON.parse(body).merge('cancelledDate' => kind_of(String)) }, headers).and_raise(exception)
+        allow(RestClient).to receive(:get).with(url, default_headers).and_return(get_response)
+        allow(RestClient).to receive(:put).with(url, satisfy { |body, _| JSON.parse(body).merge('cancelledDate' => kind_of(String)) }, default_headers).and_raise(exception)
         result = described_class.cancel_request(okapi, tenant, token, requestId, reasonId)
         expect(result[:code]).to eq(500)
         expect(result[:error]).to eq('Internal error')

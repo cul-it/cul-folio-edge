@@ -1,11 +1,10 @@
 require 'cul/folio/edge'
 require 'rest-client'
+require 'support/shared_contexts'
 
 RSpec.describe CUL::FOLIO::Edge do
+  include_context 'FOLIO Edge API setup'
   describe '.request_item' do
-    let(:okapi) { 'https://folio.example.com' }
-    let(:tenant) { 'test_tenant' }
-    let(:token) { 'test_token' }
     let(:instanceId) { 'instance-123' }
     let(:holdingsId) { 'holdings-456' }
     let(:itemId) { 'item-789' }
@@ -16,13 +15,6 @@ RSpec.describe CUL::FOLIO::Edge do
     let(:servicePointId) { 'sp-222' }
     let(:comments) { 'Please hold for pickup' }
     let(:requestLevel) { 'Item' }
-    let(:headers) do
-      {
-        'X-Okapi-Tenant' => tenant,
-        'x-okapi-token' => token,
-        :accept => 'application/json',
-      }
-    end
     let(:url) { "#{okapi}/circulation/requests" }
     let(:body_hash) do
       {
@@ -44,7 +36,7 @@ RSpec.describe CUL::FOLIO::Edge do
       let(:response_double) { double('response', code: 201, body: '{}') }
 
       it 'returns code 201 and no error' do
-        allow(RestClient).to receive(:post).with(url, body_json, headers).and_return(response_double)
+        allow(RestClient).to receive(:post).with(url, body_json, default_headers).and_return(response_double)
         result = described_class.request_item(okapi, tenant, token, instanceId, holdingsId, itemId, requesterId, requestType, requestDate, fulfillmentPreference, servicePointId, comments, requestLevel)
         expect(result[:code]).to eq(201)
         expect(result[:error]).to be_nil
@@ -56,7 +48,7 @@ RSpec.describe CUL::FOLIO::Edge do
       let(:exception) { RestClient::ExceptionWithResponse.new(error_response) }
 
       it 'returns the error code and message' do
-        allow(RestClient).to receive(:post).with(url, body_json, headers).and_raise(exception)
+        allow(RestClient).to receive(:post).with(url, body_json, default_headers).and_raise(exception)
         result = described_class.request_item(okapi, tenant, token, instanceId, holdingsId, itemId, requesterId, requestType, requestDate, fulfillmentPreference, servicePointId, comments, requestLevel)
         expect(result[:code]).to eq(422)
         expect(result[:error]).to eq('Invalid request')
@@ -82,7 +74,7 @@ RSpec.describe CUL::FOLIO::Edge do
       let(:response_double) { double('response', code: 201, body: '{}') }
 
       it 'does not include patronComments in the body' do
-        allow(RestClient).to receive(:post).with(url, body_json, headers).and_return(response_double)
+        allow(RestClient).to receive(:post).with(url, body_json, default_headers).and_return(response_double)
         result = described_class.request_item(okapi, tenant, token, instanceId, holdingsId, itemId, requesterId, requestType, requestDate, fulfillmentPreference, servicePointId, comments, requestLevel)
         expect(result[:code]).to eq(201)
         expect(result[:error]).to be_nil

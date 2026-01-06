@@ -1,21 +1,13 @@
 require 'cul/folio/edge'
 require 'rest-client'
+require 'support/shared_contexts'
 
 RSpec.describe CUL::FOLIO::Edge do
+  include_context 'FOLIO Edge API setup'
   describe '.renew_item' do
-    let(:okapi) { 'https://folio.example.com' }
-    let(:tenant) { 'test_tenant' }
-    let(:token) { 'test_token' }
     let(:username) { 'testuser' }
     let(:itemId) { 'item123' }
     let(:userId) { 'user456' }
-    let(:headers) do
-      {
-        'X-Okapi-Tenant' => tenant,
-        'x-okapi-token' => token,
-        :accept => 'application/json',
-      }
-    end
     let(:url) { "#{okapi}/patron/account/#{userId}/item/#{itemId}/renew" }
 
     context 'when renewal is successful' do
@@ -24,7 +16,7 @@ RSpec.describe CUL::FOLIO::Edge do
 
       it 'returns the new due date and code 200' do
         allow(described_class).to receive(:patron_record).with(okapi, tenant, token, username).and_return(patron_record_response)
-        allow(RestClient).to receive(:post).with(url, {}, headers).and_return(response_double)
+        allow(RestClient).to receive(:post).with(url, {}, default_headers).and_return(response_double)
         result = described_class.renew_item(okapi, tenant, token, username, itemId)
         expect(result[:due_date]).to eq('2026-01-31T23:59:59Z')
         expect(result[:code]).to eq(200)
@@ -40,7 +32,7 @@ RSpec.describe CUL::FOLIO::Edge do
 
       it 'returns the error code and message' do
         allow(described_class).to receive(:patron_record).with(okapi, tenant, token, username).and_return(patron_record_response)
-        allow(RestClient).to receive(:post).with(url, {}, headers).and_raise(exception)
+        allow(RestClient).to receive(:post).with(url, {}, default_headers).and_raise(exception)
         result = described_class.renew_item(okapi, tenant, token, username, itemId)
         expect(result[:due_date]).to be_nil
         expect(result[:code]).to eq(422)
