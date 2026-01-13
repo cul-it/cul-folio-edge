@@ -8,19 +8,19 @@ module CUL
       class Error < StandardError; end
 
         ##
-        # Connects to an Okapi instance and uses an authentication endpoint
+        # Connects to a FOLIO API gateway and uses an authentication endpoint
         # to authenticate the user. 
         #
         # Params:
-        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
-        # +tenant+:: FOLIO/OKAPI tenant ID
+        # +okapi+:: URL of a FOLIO API gateway (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: FOLIO tenant ID
         # +username+:: Username
         # +password+:: Password
-        # +method+:: :new or :old, specifying which authentication scheme is used by the Okapi instance
+        # +method+:: :new or :old, specifying which authentication scheme is used by the gateway
         #
         # Return:
         # A hash containing:
-        # +:token+:: An Okapi Access Token, or nil
+        # +:token+:: A FOLIO Access Token, or nil
         # +:token_exp+:: The expiration date of the token, or nil
         # +:code+:: An HTTP response code
         # +:error+:: An error message, or nil
@@ -45,13 +45,13 @@ module CUL
         end
 
         ##
-        # Connects to an Okapi instance and uses the +/users+ endpoint
+        # Connects to a FOLIO API gateway and uses the +/users+ endpoint
         # to retrieve a user's FOLIO record.
         #
         # Params:
-        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
-        # +tenant+:: An Okapi tenant ID
-        # +token+:: An Okapi token string from a previous authentication call
+        # +okapi+:: URL of a FOLIO API gateway (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: A FOLIO tenant ID
+        # +token+:: A FOLIO auth token string from a previous authentication call
         # +username+:: The 'username' property of a user record in FOLIO (For CUL, this is the user's NetId) 
         #
         # Return:
@@ -94,13 +94,13 @@ module CUL
         end
 
         ##
-        # Connects to an Okapi instance and uses the +/patron/account+ endpoint
+        # Connects to a FOLIO API gateway and uses the +/patron/account+ endpoint
         # from the +edge-patron+ module to retrieve a user's account information
         #
         # Params:
-        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
-        # +tenant+:: An Okapi tenant ID
-        # +token+:: An Okapi token string from a previous authentication call
+        # +okapi+:: URL of a FOLIO API gateway (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: A FOLIO tenant ID
+        # +token+:: A FOLIO auth token string from a previous authentication call
         # +identifiers+:: A hash containing either a +:folio_id+ string (a FOLIO user's UUID)
         # or a +:username+ string (a FOLIO user's username)
         #
@@ -153,13 +153,13 @@ module CUL
         end
 
         ##
-        # Connects to an Okapi instance and uses the +/patron/account+ endpoint
+        # Connects to a FOLIO API gateway and uses the +/patron/account+ endpoint
         # from the +edge-patron+ module to renew an item
         #
         # Params:
-        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
-        # +tenant+:: An Okapi tenant ID
-        # +token+:: An Okapi token string from a previous authentication call
+        # +okapi+:: URL of a FOLIO API gateway (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: A FOLIO tenant ID
+        # +token+:: A FOLIO auth token string from a previous authentication call
         # +userId+:: A FOLIO user username
         # +itemId+:: A FOLIO item UUID
         #
@@ -198,15 +198,15 @@ module CUL
         end
 
         ##
-        # Connects to an Okapi instance and uses the +/circulation/rules/request-policy+ endpoint
+        # Connects to a FOLIO API gateway and uses the +/circulation/rules/request-policy+ endpoint
         # and the +/request-policy-storage/request-policies+ endpoint
         # to determine which request methods can be used for the patron/item/location combination
         # specified.
         #
         # Params:
-        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
-        # +tenant+:: An Okapi tenant ID
-        # +token+:: An Okapi token string from a previous authentication call
+        # +okapi+:: URL of a FOLIO API gateway (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: A FOLIO tenant ID
+        # +token+:: A FOLIO auth token string from a previous authentication call
         # +patronGroupId+:: A FOLIO patron group UUID
         # +materialTypeId+:: A FOLIO material type UUID (NOTE that the FOLIO API calls this parameter
         # "item type")
@@ -267,13 +267,13 @@ module CUL
         end
         
         ##
-        # Connects to an Okapi instance and uses the +/inventory/instances+ endpoint
+        # Connects to a FOLIO API gateway and uses the +/inventory/instances+ endpoint
         # to retrieve an instance record for the specified UUID.
         #
         # Params:
-        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
-        # +tenant+:: An Okapi tenant ID
-        # +token+:: An Okapi token string from a previous authentication call
+        # +okapi+:: URL of a FOLIO API gateway (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: A FOLIO tenant ID
+        # +token+:: A FOLIO auth token string from a previous authentication call
         # +instanceId+:: A FOLIO instance record UUID
         #
         # Return:
@@ -307,13 +307,13 @@ module CUL
         end
 
         ##
-        # Connects to an Okapi instance and uses the +/circulation/requests+ endpoint
+        # Connects to a FOLIO API gateway and uses the +/circulation/requests+ endpoint
         # to create a new FOLIO request.
         #
         # Params:
-        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
-        # +tenant+:: An Okapi tenant ID
-        # +token+:: An Okapi token string from a previous authentication call
+        # +okapi+:: URL of a FOLIO API gateway (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: A FOLIO tenant ID
+        # +token+:: A FOLIO auth token string from a previous authentication call
         # +instanceId+:: UUID of the item's parent instance record
         # +holdingsId+:: UUID of the item's parent holdings record
         # +itemId+:: UUID of the item requested
@@ -374,9 +374,9 @@ module CUL
         # to cancel an existing FOLIO request.
         #
         # Params:
-        # +okapi+:: URL of the FOLIO instance
-        # +tenant+:: A tenant ID required in the header by FOLIO
-        # +token+:: An authentication token string from a previous call
+        # +okapi+:: URL of the FOLIO API gateway
+        # +tenant+:: A FOLIO tenant ID required in the header by FOLIO
+        # +token+:: A FOLIO auth token string from a previous call
         # +requestId+:: UUID of the request to be cancelled
         # +reasonId+:: UUID of a request cancellation reason 
         #
@@ -449,13 +449,13 @@ module CUL
         end
 
         ##
-        # Connects to an Okapi instance and uses the +/service-points+ endpoint
+        # Connects to a FOLIO API gateway and uses the +/service-points+ endpoint
         # to look up a service point based on ID.
         #
         # Params:
-        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
-        # +tenant+:: An Okapi tenant ID
-        # +token+:: An Okapi token string from a previous authentication call
+        # +okapi+:: URL of a FOLIO API gateway (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: A FOLIO tenant ID
+        # +token+:: A FOLIO auth token string from a previous authentication call
         # +spId:: UUID of a service point
         #
         # Return:
@@ -522,10 +522,9 @@ module CUL
           self.authenticate_request(url, headers, body, :new)
         end
 
-        
-        # Authenticates a request to the given Okapi URL with the provided headers and body.
+        # Authenticates a request to the given FOLIO API gateway URL with the provided headers and body.
         #
-        # @param url [String] the Okapi URL to send the request to
+        # @param url [String] the FOLIO API gateway URL to send the request to
         # @param headers [Hash] the headers to include in the request
         # @param body [String] the body of the request
         # @param method [Symbol] the method to use for authentication (:new or other)

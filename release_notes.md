@@ -1,5 +1,9 @@
 # Release Notes - cul-folio-edge
 
+## [IN PROGRESS]
+### Changed
+- Update code comments to replace 'Okapi' with more generic references to API gateway (today Kong, tomorrow ...?)
+
 ## [3.3] - 2026-01-05
 ### Changed
 - Upcoming Sunflower Folio change, we are moving from Okapi to Kong. Updated the `cancel` method to support Kong's smaller payload (DACCESS-673)
