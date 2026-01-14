@@ -6,6 +6,7 @@ module CUL
   module FOLIO
     module Edge
       class Error < StandardError; end
+      class AuthenticationError < Error; end
 
         ##
         # Connects to a FOLIO API gateway and uses an authentication endpoint
@@ -61,6 +62,7 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.patron_record(okapi, tenant, token, username)
+          check_token(token)
           url = "#{okapi}/users?query=(username==#{username})"
           headers = {
             'X-Okapi-Tenant' => tenant,
@@ -111,6 +113,7 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.patron_account(okapi, tenant, token, identifiers)
+          check_token(token)
           folio_id = identifiers[:folio_id]
           if folio_id.nil?
             # TODO: Add error checking here -- :username could be blank, or the return from
@@ -170,6 +173,7 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.renew_item(okapi, tenant, token, username, itemId)
+          check_token(token)
           userId = self.patron_record(okapi, tenant, token, username)[:user]['id']
           # TODO: Add error checking here -- :username could be blank, or the return from
           # patron_uuid could fail
@@ -220,6 +224,8 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.request_options(okapi, tenant, token, patronGroupId, materialTypeId, loanTypeId, locationId)
+          check_token(token)
+
           # Step 1: Plug info about the item and patron in to the circ rules calculator to identify which
           # request policy should be applied
           url = "#{okapi}/circulation/rules/request-policy?item_type_id=#{materialTypeId}&loan_type_id=#{loanTypeId}&patron_type_id=#{patronGroupId}&location_id=#{locationId}"
@@ -283,6 +289,7 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.instance_record(okapi, tenant, token, instanceId)
+          check_token(token)
           url = "#{okapi}/inventory/instances/#{instanceId}"
           headers = {
             'X-Okapi-Tenant' => tenant,
@@ -331,6 +338,7 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.request_item(okapi, tenant, token, instanceId, holdingsId, itemId, requesterId, requestType, requestDate, fulfillmentPreference, servicePointId, comments = '', requestLevel = 'Item')
+          check_token(token)
           url = "#{okapi}/circulation/requests"
           headers = {
             'X-Okapi-Tenant' => tenant,
@@ -386,6 +394,7 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.cancel_request(okapi, tenant, token, requestId, reasonId)
+          check_token(token)
           url = "#{okapi}/circulation/requests/#{requestId}"
           headers = {
             'X-Okapi-Tenant' => tenant,
@@ -465,6 +474,7 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.service_point(okapi, tenant, token, spId)
+          check_token(token)
           url = "#{okapi}/service-points/#{spId}"
           headers = {
             'X-Okapi-Tenant' => tenant,
@@ -557,10 +567,21 @@ module CUL
           rescue RestClient::ExceptionWithResponse => err
             return_value[:code] = err.response.code
             return_value[:error] = err.response.body
+          rescue RestClient::Exceptions::OpenTimeout, RestClient::Exceptions::ReadTimeout, SocketError => err
+            return_value[:code] = err.response.code if err.respond_to?(:response) && err.response
+            return_value[:error] = "Network error: #{err.class} - #{err.message}"
           end
   
           return_value
         end
+
+        # Raises AuthenticationError if token is missing or empty
+        def self.check_token(token)
+          if token.to_s.strip.empty?
+            raise AuthenticationError, 'Authentication token is missing.'
+          end
+        end
+        private_class_method :check_token
     end
   end
 end
