@@ -568,7 +568,7 @@ module CUL
             return_value[:code] = err.response.code
             return_value[:error] = err.response.body
           rescue RestClient::Exceptions::OpenTimeout, RestClient::Exceptions::ReadTimeout, SocketError => err
-            return_value[:code] = nil
+            return_value[:code] = err.response.code if err.respond_to?(:response) && err.response
             return_value[:error] = "Network error: #{err.class} - #{err.message}"
           end
   
