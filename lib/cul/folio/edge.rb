@@ -578,7 +578,7 @@ module CUL
         # Raises AuthenticationError if token is missing or empty
         def self.check_token(token)
           if token.nil? || token.to_s.strip.empty?
-            raise AuthenticationError, 'Authentication token is required.'
+            raise AuthenticationError, 'Authentication token is missing.'
           end
         end
         private_class_method :check_token
