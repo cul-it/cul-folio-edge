@@ -1,6 +1,9 @@
 # Release Notes - cul-folio-edge
 
 ## [4.0] - 2026-01-16
+### Added
+- RSpec tests for full coverage of class methods (DACCESS-97)
+
 ### Changed
 - Update code comments to replace 'Okapi' with more generic references to API gateway (today Kong, tomorrow ...?)
 - Non-authentication methods will raise an `AuthenticationError` if called with a nil token (DACCESS-807)
