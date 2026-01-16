@@ -1,13 +1,12 @@
 # Release Notes - cul-folio-edge
 
-## [IN PROGRESS]
+## [4.0] - 2026-01-16
 ### Changed
 - Update code comments to replace 'Okapi' with more generic references to API gateway (today Kong, tomorrow ...?)
 - Non-authentication methods will raise an `AuthenticationError` if called with a nil token (DACCESS-807)
 
 ### Fixed
 - Properly handle network-level errors in authentication (DACCESS-807)
-
 
 ## [3.3] - 2026-01-05
 ### Changed
