@@ -6,21 +6,22 @@ module CUL
   module FOLIO
     module Edge
       class Error < StandardError; end
+      class AuthenticationError < Error; end
 
         ##
-        # Connects to an Okapi instance and uses an authentication endpoint
+        # Connects to a FOLIO API gateway and uses an authentication endpoint
         # to authenticate the user. 
         #
         # Params:
-        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
-        # +tenant+:: FOLIO/OKAPI tenant ID
+        # +okapi+:: URL of a FOLIO API gateway (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: FOLIO tenant ID
         # +username+:: Username
         # +password+:: Password
-        # +method+:: :new or :old, specifying which authentication scheme is used by the Okapi instance
+        # +method+:: :new or :old, specifying which authentication scheme is used by the gateway
         #
         # Return:
         # A hash containing:
-        # +:token+:: An Okapi Access Token, or nil
+        # +:token+:: A FOLIO Access Token, or nil
         # +:token_exp+:: The expiration date of the token, or nil
         # +:code+:: An HTTP response code
         # +:error+:: An error message, or nil
@@ -45,13 +46,13 @@ module CUL
         end
 
         ##
-        # Connects to an Okapi instance and uses the +/users+ endpoint
+        # Connects to a FOLIO API gateway and uses the +/users+ endpoint
         # to retrieve a user's FOLIO record.
         #
         # Params:
-        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
-        # +tenant+:: An Okapi tenant ID
-        # +token+:: An Okapi token string from a previous authentication call
+        # +okapi+:: URL of a FOLIO API gateway (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: A FOLIO tenant ID
+        # +token+:: A FOLIO auth token string from a previous authentication call
         # +username+:: The 'username' property of a user record in FOLIO (For CUL, this is the user's NetId) 
         #
         # Return:
@@ -61,6 +62,7 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.patron_record(okapi, tenant, token, username)
+          check_token(token)
           url = "#{okapi}/users?query=(username==#{username})"
           headers = {
             'X-Okapi-Tenant' => tenant,
@@ -94,13 +96,13 @@ module CUL
         end
 
         ##
-        # Connects to an Okapi instance and uses the +/patron/account+ endpoint
+        # Connects to a FOLIO API gateway and uses the +/patron/account+ endpoint
         # from the +edge-patron+ module to retrieve a user's account information
         #
         # Params:
-        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
-        # +tenant+:: An Okapi tenant ID
-        # +token+:: An Okapi token string from a previous authentication call
+        # +okapi+:: URL of a FOLIO API gateway (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: A FOLIO tenant ID
+        # +token+:: A FOLIO auth token string from a previous authentication call
         # +identifiers+:: A hash containing either a +:folio_id+ string (a FOLIO user's UUID)
         # or a +:username+ string (a FOLIO user's username)
         #
@@ -111,6 +113,7 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.patron_account(okapi, tenant, token, identifiers)
+          check_token(token)
           folio_id = identifiers[:folio_id]
           if folio_id.nil?
             # TODO: Add error checking here -- :username could be blank, or the return from
@@ -153,13 +156,13 @@ module CUL
         end
 
         ##
-        # Connects to an Okapi instance and uses the +/patron/account+ endpoint
+        # Connects to a FOLIO API gateway and uses the +/patron/account+ endpoint
         # from the +edge-patron+ module to renew an item
         #
         # Params:
-        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
-        # +tenant+:: An Okapi tenant ID
-        # +token+:: An Okapi token string from a previous authentication call
+        # +okapi+:: URL of a FOLIO API gateway (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: A FOLIO tenant ID
+        # +token+:: A FOLIO auth token string from a previous authentication call
         # +userId+:: A FOLIO user username
         # +itemId+:: A FOLIO item UUID
         #
@@ -170,6 +173,7 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.renew_item(okapi, tenant, token, username, itemId)
+          check_token(token)
           userId = self.patron_record(okapi, tenant, token, username)[:user]['id']
           # TODO: Add error checking here -- :username could be blank, or the return from
           # patron_uuid could fail
@@ -198,15 +202,15 @@ module CUL
         end
 
         ##
-        # Connects to an Okapi instance and uses the +/circulation/rules/request-policy+ endpoint
+        # Connects to a FOLIO API gateway and uses the +/circulation/rules/request-policy+ endpoint
         # and the +/request-policy-storage/request-policies+ endpoint
         # to determine which request methods can be used for the patron/item/location combination
         # specified.
         #
         # Params:
-        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
-        # +tenant+:: An Okapi tenant ID
-        # +token+:: An Okapi token string from a previous authentication call
+        # +okapi+:: URL of a FOLIO API gateway (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: A FOLIO tenant ID
+        # +token+:: A FOLIO auth token string from a previous authentication call
         # +patronGroupId+:: A FOLIO patron group UUID
         # +materialTypeId+:: A FOLIO material type UUID (NOTE that the FOLIO API calls this parameter
         # "item type")
@@ -220,6 +224,8 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.request_options(okapi, tenant, token, patronGroupId, materialTypeId, loanTypeId, locationId)
+          check_token(token)
+
           # Step 1: Plug info about the item and patron in to the circ rules calculator to identify which
           # request policy should be applied
           url = "#{okapi}/circulation/rules/request-policy?item_type_id=#{materialTypeId}&loan_type_id=#{loanTypeId}&patron_type_id=#{patronGroupId}&location_id=#{locationId}"
@@ -267,13 +273,13 @@ module CUL
         end
         
         ##
-        # Connects to an Okapi instance and uses the +/inventory/instances+ endpoint
+        # Connects to a FOLIO API gateway and uses the +/inventory/instances+ endpoint
         # to retrieve an instance record for the specified UUID.
         #
         # Params:
-        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
-        # +tenant+:: An Okapi tenant ID
-        # +token+:: An Okapi token string from a previous authentication call
+        # +okapi+:: URL of a FOLIO API gateway (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: A FOLIO tenant ID
+        # +token+:: A FOLIO auth token string from a previous authentication call
         # +instanceId+:: A FOLIO instance record UUID
         #
         # Return:
@@ -283,6 +289,7 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.instance_record(okapi, tenant, token, instanceId)
+          check_token(token)
           url = "#{okapi}/inventory/instances/#{instanceId}"
           headers = {
             'X-Okapi-Tenant' => tenant,
@@ -307,13 +314,13 @@ module CUL
         end
 
         ##
-        # Connects to an Okapi instance and uses the +/circulation/requests+ endpoint
+        # Connects to a FOLIO API gateway and uses the +/circulation/requests+ endpoint
         # to create a new FOLIO request.
         #
         # Params:
-        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
-        # +tenant+:: An Okapi tenant ID
-        # +token+:: An Okapi token string from a previous authentication call
+        # +okapi+:: URL of a FOLIO API gateway (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: A FOLIO tenant ID
+        # +token+:: A FOLIO auth token string from a previous authentication call
         # +instanceId+:: UUID of the item's parent instance record
         # +holdingsId+:: UUID of the item's parent holdings record
         # +itemId+:: UUID of the item requested
@@ -331,6 +338,7 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.request_item(okapi, tenant, token, instanceId, holdingsId, itemId, requesterId, requestType, requestDate, fulfillmentPreference, servicePointId, comments = '', requestLevel = 'Item')
+          check_token(token)
           url = "#{okapi}/circulation/requests"
           headers = {
             'X-Okapi-Tenant' => tenant,
@@ -374,9 +382,9 @@ module CUL
         # to cancel an existing FOLIO request.
         #
         # Params:
-        # +okapi+:: URL of the FOLIO instance
-        # +tenant+:: A tenant ID required in the header by FOLIO
-        # +token+:: An authentication token string from a previous call
+        # +okapi+:: URL of the FOLIO API gateway
+        # +tenant+:: A FOLIO tenant ID required in the header by FOLIO
+        # +token+:: A FOLIO auth token string from a previous call
         # +requestId+:: UUID of the request to be cancelled
         # +reasonId+:: UUID of a request cancellation reason 
         #
@@ -386,6 +394,7 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.cancel_request(okapi, tenant, token, requestId, reasonId)
+          check_token(token)
           url = "#{okapi}/circulation/requests/#{requestId}"
           headers = {
             'X-Okapi-Tenant' => tenant,
@@ -449,13 +458,13 @@ module CUL
         end
 
         ##
-        # Connects to an Okapi instance and uses the +/service-points+ endpoint
+        # Connects to a FOLIO API gateway and uses the +/service-points+ endpoint
         # to look up a service point based on ID.
         #
         # Params:
-        # +okapi+:: URL of an okapi instance (e.g., "https://folio-snapshot-okapi.dev.folio.org")
-        # +tenant+:: An Okapi tenant ID
-        # +token+:: An Okapi token string from a previous authentication call
+        # +okapi+:: URL of a FOLIO API gateway (e.g., "https://folio-snapshot-okapi.dev.folio.org")
+        # +tenant+:: A FOLIO tenant ID
+        # +token+:: A FOLIO auth token string from a previous authentication call
         # +spId:: UUID of a service point
         #
         # Return:
@@ -465,6 +474,7 @@ module CUL
         # +:error+:: An error message, or nil
         ##
         def self.service_point(okapi, tenant, token, spId)
+          check_token(token)
           url = "#{okapi}/service-points/#{spId}"
           headers = {
             'X-Okapi-Tenant' => tenant,
@@ -522,10 +532,9 @@ module CUL
           self.authenticate_request(url, headers, body, :new)
         end
 
-        
-        # Authenticates a request to the given Okapi URL with the provided headers and body.
+        # Authenticates a request to the given FOLIO API gateway URL with the provided headers and body.
         #
-        # @param url [String] the Okapi URL to send the request to
+        # @param url [String] the FOLIO API gateway URL to send the request to
         # @param headers [Hash] the headers to include in the request
         # @param body [String] the body of the request
         # @param method [Symbol] the method to use for authentication (:new or other)
@@ -558,10 +567,21 @@ module CUL
           rescue RestClient::ExceptionWithResponse => err
             return_value[:code] = err.response.code
             return_value[:error] = err.response.body
+          rescue RestClient::Exceptions::OpenTimeout, RestClient::Exceptions::ReadTimeout, SocketError => err
+            return_value[:code] = err.response.code if err.respond_to?(:response) && err.response
+            return_value[:error] = "Network error: #{err.class} - #{err.message}"
           end
   
           return_value
         end
+
+        # Raises AuthenticationError if token is missing or empty
+        def self.check_token(token)
+          if token.to_s.strip.empty?
+            raise AuthenticationError, 'Authentication token is missing.'
+          end
+        end
+        private_class_method :check_token
     end
   end
 end
